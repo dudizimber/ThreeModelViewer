@@ -71,6 +71,11 @@ class _ModelViewerState extends State<ModelViewer> {
     controller?.runJavascript('window.setCameraPosition($x, $y, $z)');
   }
 
+  void setCameraRotation(double x, double y, double z) {
+    if (hasError) return;
+    controller?.runJavascript('window.setCameraRotation($x, $y, $z)');
+  }
+
   void addAmbientLight(String color, int intensity) {
     if (hasError) return;
     controller?.runJavascript('window.addAmbientLight(\'$color\', $intensity)');
@@ -98,6 +103,7 @@ class _ModelViewerState extends State<ModelViewer> {
         setBackgroundColor: setBackgroundColor,
         addAmbientLight: addAmbientLight,
         setCameraPosition: setCameraPosition,
+        setCameraRotation: setCameraRotation,
         addDirectionalLight: addDirectionalLight));
   }
 
