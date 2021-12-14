@@ -6,9 +6,16 @@ import 'package:local_assets_server/local_assets_server.dart';
 import 'package:three_model_viewer/model_viewer_controller.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+class ThreeModel {
+  String src;
+  bool playAnimation;
+  ThreeModel({required this.src, required this.playAnimation});
+}
+
 class ModelViewer extends StatefulWidget {
-  final String modelUrl;
+  final List<ThreeModel> models;
   final Function(ModelViewerController controller) onPageLoaded;
+  final int fov;
   final Function(bool ready)? onServerReady;
   final Function(double? percentage)? onObjectLoading;
   final Function()? onObjectLoaded;
@@ -17,8 +24,9 @@ class ModelViewer extends StatefulWidget {
 
   const ModelViewer({
     Key? key,
-    required this.modelUrl,
+    required this.models,
     required this.onPageLoaded,
+    this.fov = 50,
     this.onServerReady,
     this.onError,
     this.onObjectLoaded,
@@ -42,12 +50,15 @@ class _ModelViewerState extends State<ModelViewer> {
 
   void setupScene() {
     if (hasError) return;
-    controller?.runJavascript('window.setupScene()');
+    controller?.runJavascript('window.setupScene(\'${widget.fov}\')');
   }
 
-  void loadModel() {
+  void loadModels() {
     if (hasError) return;
-    controller?.runJavascript('window.loadModel(\'${widget.modelUrl}\')');
+    for (var model in widget.models) {
+      controller?.runJavascript(
+          'window.loadModel(\'${model.src}\', ${model.playAnimation})');
+    }
   }
 
   void setBackgroundColor(String color, double alpha) {
@@ -65,6 +76,12 @@ class _ModelViewerState extends State<ModelViewer> {
     controller?.runJavascript('window.addAmbientLight(\'$color\', $intensity)');
   }
 
+  void addDirectionalLight(String color, int intensity, Map<String, num> pos) {
+    if (hasError) return;
+    controller?.runJavascript(
+        'window.addDirectionalLight(\'$color\', $intensity, $pos)');
+  }
+
   void _onObjectLoaded() {
     if (widget.onObjectLoaded != null) widget.onObjectLoaded!();
     Timer(const Duration(milliseconds: 400), () {
@@ -76,12 +93,12 @@ class _ModelViewerState extends State<ModelViewer> {
 
   void _onPageFinishedLoading(_) {
     setupScene();
-    loadModel();
+    loadModels();
     widget.onPageLoaded(ModelViewerController(
-      setBackgroundColor: setBackgroundColor,
-      addAmbientLight: addAmbientLight,
-      setCameraPosition: setCameraPosition,
-    ));
+        setBackgroundColor: setBackgroundColor,
+        addAmbientLight: addAmbientLight,
+        setCameraPosition: setCameraPosition,
+        addDirectionalLight: addDirectionalLight));
   }
 
   @override

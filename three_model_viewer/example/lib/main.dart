@@ -33,14 +33,26 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.teal[900],
         body: ModelViewer(
-          modelUrl:
-              'https://storage.googleapis.com/flutter-futx.appspot.com/test/test.gltf',
+          models: [
+            ThreeModel(
+              src:
+                  'https://storage.googleapis.com/flutter-futx.appspot.com/test/FutX_Characters_Hulk.glb',
+              playAnimation: true,
+            ),
+            // ThreeModel(
+            //   src:
+            //       'https://storage.googleapis.com/flutter-futx.appspot.com/test/FutX_Lights_tier7_3.glb',
+            //   playAnimation: false,
+            // ),
+          ],
           onPageLoaded: (controller) {
-            controller.setBackgroundColor('#000', .2);
+            controller.setBackgroundColor('#000', 0);
             controller.setCameraPosition(0, 5, 2);
-            controller.addAmbientLight('#404040', 10);
+            controller.addAmbientLight('#404040', 2);
+            controller
+                .addDirectionalLight('#FFFFFF', 2, {'x': 10, 'y': 20, 'z': 30});
           },
           onObjectLoading: (percentage) {
             print('$percentage');

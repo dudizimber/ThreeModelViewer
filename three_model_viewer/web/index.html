@@ -5,8 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Model Viewer</title>
-  <script type="module" crossorigin src="/assets/index.4e799c6e.js"></script>
-  <link rel="modulepreload" href="/assets/vendor.9783f098.js">
+  <script type="module" crossorigin src="/assets/index.c257469f.js"></script>
+  <link rel="modulepreload" href="/assets/vendor.141b9991.js">
   <link rel="stylesheet" href="/assets/index.a6f3e8da.css">
 </head>
 
@@ -26,6 +26,8 @@
      * 
      * addAmbientLight(color: string, intensity: number)
      * 
+     * addDirectionalLight(color: string, intensity: number, pos: { x: number, y: number, z: number })
+     * 
      * setCameraPosition(x: number, y: number, z: numer)
      * 
      * setCameraRotation(x: number, y: number, z: numer)
@@ -40,12 +42,33 @@
      **/
 
 
+    // setTimeout(async () => {
+    //   window.setupScene(50);
+    //   const gltf = await window.loadModel("https://storage.googleapis.com/flutter-futx.appspot.com/test/FutX_Junto_meioTermo.glb", true)
+    //   console.log('gltf', gltf);
+    //   // const lights = await window.loadModel("https://storage.googleapis.com/flutter-futx.appspot.com/test/FutX_Lights_tier7.glb", false)
+    //   // console.log(lights);
+    //   // window.setBackgroundColor('#000', 1);
+    //   window.setCameraPosition(0, 5, 2);
+    //   // window.addAmbientLight('#404040', 2);
+    // }, 1000);
+
+
     window.onObjectLoading = (percentage) => {
 
       try {
         OnObjectLoading.postMessage(`${percentage}`);
       } catch (error) {
       }
+    }
+
+    window.onLoadError = (error) => {
+      try {
+        OnLoadError.postMessage(`${error}`);
+      } catch (error) {
+
+      }
+
     }
   </script>
 </body>

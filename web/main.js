@@ -1,5 +1,5 @@
 import './style.css'
-import { AnimationMixer, WebGLRenderer, AmbientLight, Scene, PerspectiveCamera, Clock } from 'three';
+import { AnimationMixer, WebGLRenderer, AmbientLight, Scene, PerspectiveCamera, Clock, DirectionalLight, SpotLight, SpotLightHelper, CameraHelper, sRGBEncoding } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -8,13 +8,16 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 let scene, camera, clock, renderer, mixer, controls, loader, renderedObjects;
 
 
-const setupScene = () => {
+const setupScene = (fov) => {
 
 	scene = new Scene();
-	camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+	camera = new PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 1000);
 	clock = new Clock();
 
-	renderer = new WebGLRenderer({ alpha: true });
+	renderer = new WebGLRenderer({ alpha: true, antialias: true, });
+	renderer.physicallyCorrectLights = true;
+	renderer.outputEncoding = sRGBEncoding;
+	renderer.setClearColor(0xcccccc);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.body.appendChild(renderer.domElement);
 	controls = new OrbitControls(camera, renderer.domElement);
@@ -35,7 +38,7 @@ const setCameraRotation = (x, y, z) => {
 	controls.update();
 }
 
-const loadModel = (modelUrl) => {
+const loadModel = (modelUrl, playAnimation) => {
 
 	return new Promise((res, rej) => {
 
@@ -56,13 +59,21 @@ const loadModel = (modelUrl) => {
 			// called when the resource is loaded
 			(gltf) => {
 
-				mixer = new AnimationMixer(gltf.scene);
-				const action = mixer.clipAction(gltf.animations[0]);
-				action.play();
+				if (playAnimation) {
+					mixer = new AnimationMixer(gltf.scene);
+					const action = mixer.clipAction(gltf.animations[0]);
+					action.play();
 
+					renderedObjects = gltf.scene.children;
+				}
+				gltf.scene.traverse(function (node) {
+					if (node.isMesh) {
+						node.castShadow = true;
+						node.material.depthWrite = !node.material.transparent;
+					}
+				});
 				scene.add(gltf.scene);
-
-				renderedObjects = gltf.scene.children;
+				console.log(scene);
 
 				animate();
 
@@ -75,8 +86,9 @@ const loadModel = (modelUrl) => {
 			},
 			// called when loading has errors
 			(error) => {
-				console.log('An error happened');
-				rej(err);
+				console.log('An error happened', error);
+				window.onLoadError(error);
+				rej(error);
 			}
 		);
 
@@ -89,12 +101,17 @@ const lockTarget = () => {
 }
 
 const addAmbientLight = (color, intensity) => {
-	const light = new AmbientLight(color, intensity);
-	scene.add(light);
+	const ambient = new AmbientLight(color, intensity);
+	scene.add(ambient);
+}
+
+const addDirectionalLight = (color, intensity, pos) => {
+    const light2  = new DirectionalLight(color, intensity ?? 0.8 * Math.PI);
+    light2.position.set(pos?.x ?? 0.5, pos?.y ?? 0, pos?.z ?? 0.866);
+    scene.add( light2 );
 }
 
 const animate = () => {
-	console.log('Animating');
 	requestAnimationFrame(animate);
 	var delta = clock.getDelta();
 	if (mixer) mixer.update(delta);
@@ -105,6 +122,7 @@ const animate = () => {
 window.setupScene = setupScene;
 window.loadModel = loadModel;
 window.addAmbientLight = addAmbientLight;
+window.addDirectionalLight = addDirectionalLight;
 window.setCameraPosition = setCameraPosition;
 window.setCameraRotation = setCameraRotation;
 window.setBackgroundColor = setBackgroundColor;

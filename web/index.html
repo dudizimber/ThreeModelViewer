@@ -23,6 +23,8 @@
      * 
      * addAmbientLight(color: string, intensity: number)
      * 
+     * addDirectionalLight(color: string, intensity: number, pos: { x: number, y: number, z: number })
+     * 
      * setCameraPosition(x: number, y: number, z: numer)
      * 
      * setCameraRotation(x: number, y: number, z: numer)
@@ -38,13 +40,15 @@
 
 
     // setTimeout(async () => {
-    //   window.setupScene();
-    //   const gltf = await window.loadModel("https://storage.googleapis.com/flutter-futx.appspot.com/test/test.gltf")
-    //   console.log(gltf);
-    //   window.setBackgroundColor('#000', 0);
+    //   window.setupScene(50);
+    //   const gltf = await window.loadModel("https://storage.googleapis.com/flutter-futx.appspot.com/test/FutX_Junto_meioTermo.glb", true)
+    //   console.log('gltf', gltf);
+    //   // const lights = await window.loadModel("https://storage.googleapis.com/flutter-futx.appspot.com/test/FutX_Lights_tier7.glb", false)
+    //   // console.log(lights);
+    //   // window.setBackgroundColor('#000', 1);
     //   window.setCameraPosition(0, 5, 2);
-    //   window.addAmbientLight('#404040', 10);
-    // }, 0);
+    //   // window.addAmbientLight('#404040', 2);
+    // }, 1000);
 
 
     window.onObjectLoading = (percentage) => {
@@ -53,6 +57,15 @@
         OnObjectLoading.postMessage(`${percentage}`);
       } catch (error) {
       }
+    }
+
+    window.onLoadError = (error) => {
+      try {
+        OnLoadError.postMessage(`${error}`);
+      } catch (error) {
+
+      }
+
     }
   </script>
 </body>
