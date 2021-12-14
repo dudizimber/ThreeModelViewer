@@ -1,0 +1,26 @@
+name: three_model_viewer
+description: A Flutter package to render GLTF models using THREE JS.
+version: 0.0.1
+homepage: 'https://github.com/dudizimber/threemodelviewer.git'
+
+environment:
+  sdk: ">=2.15.0 <3.0.0"
+  flutter: ">=1.17.0"
+
+dependencies:
+  webview_flutter: ^3.0.0
+  local_assets_server: ^2.0.2+10
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^1.0.0
+
+flutter:
+
+  assets:
+    - web/
+    - web/assets/
+    - web/decoder/

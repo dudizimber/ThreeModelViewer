@@ -1,0 +1,16 @@
+{
+  "name": "3d-view",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --config vite.config.js",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^2.7.2"
+  },
+  "dependencies": {
+    "gl-matrix": "^3.4.3",
+    "three": "^0.135.0"
+  }
+}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Model Viewer</title>
+  <script type="module" crossorigin src="/assets/index.4e799c6e.js"></script>
+  <link rel="modulepreload" href="/assets/vendor.9783f098.js">
+  <link rel="stylesheet" href="/assets/index.a6f3e8da.css">
+</head>
+
+<body>
+  <div id="app"></div>
+  
+
+  <script>
+
+    /**
+     * 
+     * ACTIONS:
+     * 
+     * loadModel(modelUrl: string)
+     * 
+     * setBackgroundColor(color: string, alpha: number)
+     * 
+     * addAmbientLight(color: string, intensity: number)
+     * 
+     * setCameraPosition(x: number, y: number, z: numer)
+     * 
+     * setCameraRotation(x: number, y: number, z: numer)
+     * 
+     * lockTarget()
+     * 
+     * 
+     * LISTENERS:
+     * 
+     * onObjectLoading(percentage)
+     * 
+     **/
+
+
+    window.onObjectLoading = (percentage) => {
+
+      try {
+        OnObjectLoading.postMessage(`${percentage}`);
+      } catch (error) {
+      }
+    }
+  </script>
+</body>
+
+</html>

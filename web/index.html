@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Model Viewer</title>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script type="module" src="/main.js"></script>
+
+  <script>
+
+    /**
+     * 
+     * ACTIONS:
+     * 
+     * loadModel(modelUrl: string)
+     * 
+     * setBackgroundColor(color: string, alpha: number)
+     * 
+     * addAmbientLight(color: string, intensity: number)
+     * 
+     * setCameraPosition(x: number, y: number, z: numer)
+     * 
+     * setCameraRotation(x: number, y: number, z: numer)
+     * 
+     * lockTarget()
+     * 
+     * 
+     * LISTENERS:
+     * 
+     * onObjectLoading(percentage)
+     * 
+     **/
+
+
+    // setTimeout(async () => {
+    //   window.setupScene();
+    //   const gltf = await window.loadModel("https://storage.googleapis.com/flutter-futx.appspot.com/test/test.gltf")
+    //   console.log(gltf);
+    //   window.setBackgroundColor('#000', 0);
+    //   window.setCameraPosition(0, 5, 2);
+    //   window.addAmbientLight('#404040', 10);
+    // }, 0);
+
+
+    window.onObjectLoading = (percentage) => {
+
+      try {
+        OnObjectLoading.postMessage(`${percentage}`);
+      } catch (error) {
+      }
+    }
+  </script>
+</body>
+
+</html>
