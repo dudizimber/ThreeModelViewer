@@ -13,6 +13,7 @@ class ModelViewer extends StatefulWidget {
   final List<ThreeModel> models;
   final Function(ModelViewerController controller) onPageLoaded;
   final int fov;
+  final Duration loaderDuration;
   final Function(bool ready)? onServerReady;
   final Function(double? percentage)? onObjectLoading;
   final Function()? onObjectLoaded;
@@ -31,6 +32,7 @@ class ModelViewer extends StatefulWidget {
     this.onObjectLoading,
     this.showWhenLoading,
     this.orbitControls,
+    this.loaderDuration = const Duration(milliseconds: 500),
   }) : super(key: key);
 
   @override
@@ -97,7 +99,7 @@ class _ModelViewerState extends State<ModelViewer> {
 
   void _onObjectLoaded() {
     if (widget.onObjectLoaded != null) widget.onObjectLoaded!();
-    Timer(const Duration(milliseconds: 400), () {
+    Timer(widget.loaderDuration, () {
       setState(() {
         isReady = true;
       });
