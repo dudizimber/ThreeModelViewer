@@ -1,5 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:three_model_viewer/model_viewer.dart';
+import 'package:three_model_viewer/three_model_viewer.dart';
 
 void main() {
   runApp(const MyApp());
@@ -47,12 +49,19 @@ class _MyHomePageState extends State<MyHomePage> {
             //   playAnimation: false,
             // ),
           ],
+          orbitControls:
+              OrbitControls(minPolarAngle: -pi / 2, maxPolarAngle: pi / 2),
           onPageLoaded: (controller) {
             controller.setBackgroundColor('#000', 0);
-            controller.setCameraPosition(0, 5, 2);
+            controller.setCameraPosition(Vector3(x: 0, y: 5, z: 2));
             controller.addAmbientLight('#404040', 2);
-            controller
-                .addDirectionalLight('#FFFFFF', 2, {'x': 10, 'y': 20, 'z': 30});
+            controller.addDirectionalLight(
+              DirectionalLight(
+                color: Colors.white,
+                intensity: 2,
+                pos: Vector3(x: 10, y: 20, z: 30),
+              ),
+            );
           },
           onObjectLoading: (percentage) {
             print('$percentage');

@@ -4,13 +4,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:local_assets_server/local_assets_server.dart';
 import 'package:three_model_viewer/model_viewer_controller.dart';
+import 'package:three_model_viewer/models/orbit_controls.dart';
+import 'package:three_model_viewer/models/three_model.dart';
+import 'package:three_model_viewer/three_model_viewer.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-
-class ThreeModel {
-  String src;
-  bool playAnimation;
-  ThreeModel({required this.src, required this.playAnimation});
-}
 
 class ModelViewer extends StatefulWidget {
   final List<ThreeModel> models;
@@ -21,6 +18,7 @@ class ModelViewer extends StatefulWidget {
   final Function()? onObjectLoaded;
   final Function(Object error)? onError;
   final Widget? showWhenLoading;
+  final OrbitControls? orbitControls;
 
   const ModelViewer({
     Key? key,
@@ -32,6 +30,7 @@ class ModelViewer extends StatefulWidget {
     this.onObjectLoaded,
     this.onObjectLoading,
     this.showWhenLoading,
+    this.orbitControls,
   }) : super(key: key);
 
   @override
@@ -51,6 +50,10 @@ class _ModelViewerState extends State<ModelViewer> {
   void setupScene() {
     if (hasError) return;
     controller?.runJavascript('window.setupScene(\'${widget.fov}\')');
+    if (widget.orbitControls != null) {
+      controller?.runJavascript(
+          'window.setOrbitControls(${widget.orbitControls.toString()})');
+    }
   }
 
   void loadModels() {
@@ -66,14 +69,14 @@ class _ModelViewerState extends State<ModelViewer> {
     controller?.runJavascript('window.setBackgroundColor(\'$color\', $alpha)');
   }
 
-  void setCameraPosition(double x, double y, double z) {
+  void setCameraPosition(Vector3 pos) {
     if (hasError) return;
-    controller?.runJavascript('window.setCameraPosition($x, $y, $z)');
+    controller?.runJavascript('window.setCameraPosition($pos)');
   }
 
-  void setCameraRotation(double x, double y, double z) {
+  void setCameraRotation(Vector3 pos) {
     if (hasError) return;
-    controller?.runJavascript('window.setCameraRotation($x, $y, $z)');
+    controller?.runJavascript('window.setCameraRotation($pos)');
   }
 
   void addAmbientLight(String color, int intensity) {
@@ -81,10 +84,15 @@ class _ModelViewerState extends State<ModelViewer> {
     controller?.runJavascript('window.addAmbientLight(\'$color\', $intensity)');
   }
 
-  void addDirectionalLight(String color, int intensity, Map<String, num> pos) {
+  void addDirectionalLight(DirectionalLight light) {
     if (hasError) return;
     controller?.runJavascript(
-        'window.addDirectionalLight(\'$color\', $intensity, $pos)');
+        'window.addDirectionalLight(${light.toString(map: true)})');
+  }
+
+  void lockTarget() {
+    if (hasError) return;
+    controller?.runJavascript('window.lockTarget()');
   }
 
   void _onObjectLoaded() {
@@ -99,12 +107,16 @@ class _ModelViewerState extends State<ModelViewer> {
   void _onPageFinishedLoading(_) {
     setupScene();
     loadModels();
-    widget.onPageLoaded(ModelViewerController(
+    widget.onPageLoaded(
+      ModelViewerController(
         setBackgroundColor: setBackgroundColor,
         addAmbientLight: addAmbientLight,
         setCameraPosition: setCameraPosition,
         setCameraRotation: setCameraRotation,
-        addDirectionalLight: addDirectionalLight));
+        addDirectionalLight: addDirectionalLight,
+        lockTarget: lockTarget,
+      ),
+    );
   }
 
   @override

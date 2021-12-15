@@ -1,28 +1,56 @@
 import './style.css'
-import { AnimationMixer, WebGLRenderer, AmbientLight, Scene, PerspectiveCamera, Clock, DirectionalLight, SpotLight, SpotLightHelper, CameraHelper, sRGBEncoding } from 'three';
+import { AnimationMixer, WebGLRenderer, AmbientLight, Scene, PerspectiveCamera, Clock, DirectionalLight, Box3, SpotLight, SpotLightHelper, CameraHelper, sRGBEncoding, OrthographicCamera, GridHelper, AxesHelper } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 
-let scene, camera, clock, renderer, mixer, controls, loader, renderedObjects;
+let scene, camera, clock, renderer, mixer, controls, loader, renderedObjects, bbox;
 
 
 const setupScene = (fov) => {
 
 	scene = new Scene();
-	camera = new PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 1000);
+	const aspect = window.innerWidth / window.innerHeight;
+    camera = new PerspectiveCamera(fov, aspect);
 	clock = new Clock();
 
 	renderer = new WebGLRenderer({ alpha: true, antialias: true, });
+
+	renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
 	renderer.physicallyCorrectLights = true;
 	renderer.outputEncoding = sRGBEncoding;
 	renderer.setClearColor(0xcccccc);
-	renderer.setSize(window.innerWidth, window.innerHeight);
+
 	document.body.appendChild(renderer.domElement);
 	controls = new OrbitControls(camera, renderer.domElement);
-
+	
+	window.controls = controls;
+	window.camera = camera;
 }
+
+const setOrbitControls = (polMin, polMax, azMin, azMax) => {
+	controls.minPolarAngle = polMin ?? -Infinity;
+	controls.maxPolarAngle = polMax ?? Infinity;
+	controls.minAzimuthAngle = azMin ?? -Infinity;
+	controls.maxAzimuthAngle = azMax ?? -Infinity;
+}
+
+
+const addGridHelper = () => {
+    
+    var helper = new GridHelper(100, 100);
+    helper.rotation.x = Math.PI / 2;
+    helper.material.opacity = 1;
+    helper.material.transparent = false;
+    scene.add(helper);
+
+    var axis = new AxesHelper(1000);
+    scene.add(axis);
+  }
+
 
 const setBackgroundColor = (color, alpha) => {
 	renderer.setClearColor(color, alpha);
@@ -65,6 +93,9 @@ const loadModel = (modelUrl, playAnimation) => {
 					action.play();
 
 					renderedObjects = gltf.scene.children;
+					controls.target = gltf.scene.position;
+
+    				bbox = new Box3().setFromObject(gltf.scene);
 				}
 				gltf.scene.traverse(function (node) {
 					if (node.isMesh) {
@@ -97,7 +128,7 @@ const loadModel = (modelUrl, playAnimation) => {
 }
 
 const lockTarget = () => {
-	controls.target = renderedObjects[0]?.position;
+	controls.target = renderedObjects[1]?.position;
 }
 
 const addAmbientLight = (color, intensity) => {
@@ -115,12 +146,14 @@ const animate = () => {
 	requestAnimationFrame(animate);
 	var delta = clock.getDelta();
 	if (mixer) mixer.update(delta);
-	controls.update();
+    controls.update();
 	renderer.render(scene, camera);
 }
 
 window.setupScene = setupScene;
+window.setOrbitControls = setOrbitControls;
 window.loadModel = loadModel;
+window.addGridHelper = addGridHelper;
 window.addAmbientLight = addAmbientLight;
 window.addDirectionalLight = addDirectionalLight;
 window.setCameraPosition = setCameraPosition;

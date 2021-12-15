@@ -1,9 +1,13 @@
+import 'package:three_model_viewer/models/vector_3.dart';
+import 'package:three_model_viewer/three_model_viewer.dart';
+
 class ModelViewerController {
   Function(String color, double alpha) setBackgroundColor;
-  Function(double x, double y, double z) setCameraPosition;
-  Function(double x, double y, double z) setCameraRotation;
+  Function(Vector3 pos) setCameraPosition;
+  Function(Vector3 pos) setCameraRotation;
   Function(String color, int intensity) addAmbientLight;
-  Function(String color, int intensity, Map<String, num>) addDirectionalLight;
+  Function(DirectionalLight light) addDirectionalLight;
+  Function() lockTarget;
 
   ModelViewerController({
     required this.setBackgroundColor,
@@ -11,5 +15,6 @@ class ModelViewerController {
     required this.setCameraPosition,
     required this.setCameraRotation,
     required this.addDirectionalLight,
+    required this.lockTarget,
   });
 }
