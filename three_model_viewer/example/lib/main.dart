@@ -40,20 +40,20 @@ class _MyHomePageState extends State<MyHomePage> {
           models: [
             ThreeModel(
               src:
-                  'https://storage.googleapis.com/flutter-futx.appspot.com/test/FutX_Characters_Hulk.glb',
+                  'https://storage.googleapis.com/flutter-futx.appspot.com/test/FutX_Junto_meioTermo.glb',
               playAnimation: true,
             ),
             // ThreeModel(
             //   src:
-            //       'https://storage.googleapis.com/flutter-futx.appspot.com/test/FutX_Lights_tier7_3.glb',
+            //       '"https://storage.googleapis.com/flutter-futx.appspot.com/test/FutX_Camera.glb',
             //   playAnimation: false,
             // ),
           ],
           orbitControls:
-              OrbitControls(minPolarAngle: -pi / 2, maxPolarAngle: pi / 2),
+              OrbitControls(minPolarAngle: pi / 2, maxPolarAngle: pi / 2),
           onPageLoaded: (controller) {
             controller.setBackgroundColor('#000', 0);
-            controller.setCameraPosition(Vector3(x: 0, y: 5, z: 2));
+            // controller.setCameraPosition(Vector3(x: 0, y: 5, z: 2));
             controller.addAmbientLight('#404040', 2);
             controller.addDirectionalLight(
               DirectionalLight(

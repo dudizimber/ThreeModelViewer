@@ -8,30 +8,61 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 let scene, camera, clock, renderer, mixer, controls, loader, renderedObjects, bbox;
 
 
-const setupScene = (fov) => {
+let move = {
+	x: 0,
+	y: 0,
+	z: 0
+};
+
+const setupScene = () => {
 
 	scene = new Scene();
-	const aspect = window.innerWidth / window.innerHeight;
-    camera = new PerspectiveCamera(fov, aspect);
 	clock = new Clock();
 
-	renderer = new WebGLRenderer({ alpha: true, antialias: true, });
+	renderer = new WebGLRenderer({ alpha: true, antialias: true,  });
 
 	renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMap.enabled = true;
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.shadowMap.enabled = true;
 	renderer.physicallyCorrectLights = true;
 	renderer.outputEncoding = sRGBEncoding;
 	renderer.setClearColor(0xcccccc);
 
 	document.body.appendChild(renderer.domElement);
-	controls = new OrbitControls(camera, renderer.domElement);
-	
-	window.controls = controls;
+
+	setCamera();
+
+}
+
+const setCamera = () => {
+
+	camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight, .1, 1000);
+	// camera.position.copy(c.position)
+	camera.position.set(1, 0, 5)
 	window.camera = camera;
+	createControls(camera);
+}
+
+const createControls = (camera) => {
+	controls = new OrbitControls(camera, renderer.domElement);
+	controls.enablePan = false;
+	controls.enableRotate = true;
+	controls.enableZoom = false;
+	controls.target.set(0.05, 1.24, 0.14)
+	controls.update();
+	animate();
+	window.controls = controls;
+
 }
 
 const setOrbitControls = (polMin, polMax, azMin, azMax) => {
+	if (!controls) {
+		if (!camera) {
+			setTimeout(() => setOrbitControls(polMin, polMax, azMin, azMax), 100);
+		} else
+			createControls(camera);
+	return;
+	}
 	controls.minPolarAngle = polMin ?? -Infinity;
 	controls.maxPolarAngle = polMax ?? Infinity;
 	controls.minAzimuthAngle = azMin ?? -Infinity;
@@ -40,16 +71,16 @@ const setOrbitControls = (polMin, polMax, azMin, azMax) => {
 
 
 const addGridHelper = () => {
-    
-    var helper = new GridHelper(100, 100);
-    helper.rotation.x = Math.PI / 2;
-    helper.material.opacity = 1;
-    helper.material.transparent = false;
-    scene.add(helper);
 
-    var axis = new AxesHelper(1000);
-    scene.add(axis);
-  }
+	var helper = new GridHelper(100, 100);
+	helper.rotation.x = Math.PI / 2;
+	helper.material.opacity = 1;
+	helper.material.transparent = false;
+	scene.add(helper);
+
+	var axis = new AxesHelper(1000);
+	scene.add(axis);
+}
 
 
 const setBackgroundColor = (color, alpha) => {
@@ -93,9 +124,6 @@ const loadModel = (modelUrl, playAnimation) => {
 					action.play();
 
 					renderedObjects = gltf.scene.children;
-					controls.target = gltf.scene.position;
-
-    				bbox = new Box3().setFromObject(gltf.scene);
 				}
 				gltf.scene.traverse(function (node) {
 					if (node.isMesh) {
@@ -105,6 +133,48 @@ const loadModel = (modelUrl, playAnimation) => {
 				});
 				scene.add(gltf.scene);
 				console.log(scene);
+
+				res(gltf);
+			},
+			// called while loading is progressing
+			(xhr) => {
+				console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+				window.onObjectLoading((xhr.loaded / xhr.total * 100));
+			},
+			// called when loading has errors
+			(error) => {
+				console.log('An error happened', error);
+				window.onLoadError(error);
+				rej(error);
+			}
+		);
+
+	})
+
+}
+
+const loadCam = (modelUrl) => {
+
+	return new Promise((res, rej) => {
+
+
+		// Instantiate a loader
+		loader = new GLTFLoader();
+
+		// Optional: Provide a DRACOLoader instance to decode compressed mesh data
+		const dracoLoader = new DRACOLoader();
+		dracoLoader.setDecoderPath('decoder/');
+		dracoLoader.setDecoderConfig({ type: 'js' })
+		loader.setDRACOLoader(dracoLoader);
+
+		// Load a glTF resource
+		loader.load(
+			// resource URL
+			modelUrl,
+			// called when the resource is loaded
+			(gltf) => {
+
+				setCamera(gltf.cameras[0]);
 
 				animate();
 
@@ -126,7 +196,6 @@ const loadModel = (modelUrl, playAnimation) => {
 	})
 
 }
-
 const lockTarget = () => {
 	controls.target = renderedObjects[1]?.position;
 }
@@ -137,22 +206,23 @@ const addAmbientLight = (color, intensity) => {
 }
 
 const addDirectionalLight = (color, intensity, pos) => {
-    const light2  = new DirectionalLight(color, intensity ?? 0.8 * Math.PI);
-    light2.position.set(pos?.x ?? 0.5, pos?.y ?? 0, pos?.z ?? 0.866);
-    scene.add( light2 );
+	const light2 = new DirectionalLight(color, intensity ?? 0.8 * Math.PI);
+	light2.position.set(pos?.x ?? 0.5, pos?.y ?? 0, pos?.z ?? 0.866);
+	scene.add(light2);
 }
 
 const animate = () => {
 	requestAnimationFrame(animate);
 	var delta = clock.getDelta();
 	if (mixer) mixer.update(delta);
-    controls.update();
+	if (controls) controls.update();
 	renderer.render(scene, camera);
 }
 
 window.setupScene = setupScene;
 window.setOrbitControls = setOrbitControls;
 window.loadModel = loadModel;
+window.loadCam = loadCam;
 window.addGridHelper = addGridHelper;
 window.addAmbientLight = addAmbientLight;
 window.addDirectionalLight = addDirectionalLight;
@@ -160,3 +230,4 @@ window.setCameraPosition = setCameraPosition;
 window.setCameraRotation = setCameraRotation;
 window.setBackgroundColor = setBackgroundColor;
 window.lockTarget = lockTarget;
+window.setCamera = setCamera;

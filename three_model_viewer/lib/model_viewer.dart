@@ -66,6 +66,11 @@ class _ModelViewerState extends State<ModelViewer> {
     }
   }
 
+  void setCamera() {
+    if (hasError) return;
+    controller?.runJavascript('window.setCamera()');
+  }
+
   void setBackgroundColor(String color, double alpha) {
     if (hasError) return;
     controller?.runJavascript('window.setBackgroundColor(\'$color\', $alpha)');

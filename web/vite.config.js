@@ -6,6 +6,7 @@ export default defineConfig(({command, mode }) => {
     publicDir: 'public',
     build: {
       outDir: '../three_model_viewer/web',
+      minify: false
     }
   }
 });

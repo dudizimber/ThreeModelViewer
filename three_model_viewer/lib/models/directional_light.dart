@@ -11,6 +11,6 @@ class DirectionalLight {
 
   @override
   String toString({bool map = false}) {
-    return '\'${color.toString()}\', $intensity, ${pos.toString(map: map)}';
+    return '\'#${color.value.toRadixString(16).substring(2)}\', $intensity, ${pos.toString(map: map)}';
   }
 }
