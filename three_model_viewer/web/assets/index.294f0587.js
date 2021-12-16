@@ -1,4 +1,4 @@
-import { S as Scene, W as WebGLRenderer, s as sRGBEncoding, P as PerspectiveCamera, T as TrackballControls, G as GridHelper, A as AxesHelper, a as GLTFLoader, D as DRACOLoader, b as AnimationMixer, c as AmbientLight, d as DirectionalLight, C as Clock } from "./vendor.8816094c.js";
+import { S as Scene, W as WebGLRenderer, s as sRGBEncoding, P as PerspectiveCamera, O as OrbitControls, G as GridHelper, A as AxesHelper, a as GLTFLoader, D as DRACOLoader, b as AnimationMixer, c as AmbientLight, d as DirectionalLight, C as Clock } from "./vendor.ce91c239.js";
 const p = function polyfill() {
   const relList = document.createElement("link").relList;
   if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -63,8 +63,11 @@ const setCamera = () => {
   createControls(camera);
 };
 const createControls = (camera2) => {
-  controls = new TrackballControls(camera2, renderer.domElement);
-  controls.target.set(0.05, 1.44, 0.14);
+  controls = new OrbitControls(camera2, renderer.domElement);
+  controls.enablePan = false;
+  controls.enableRotate = true;
+  controls.enableZoom = false;
+  controls.target.set(0.05, 1.24, 0.14);
   controls.update();
   animate();
   window.controls = controls;

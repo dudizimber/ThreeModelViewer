@@ -102,6 +102,11 @@ class _ModelViewerState extends State<ModelViewer> {
     controller?.runJavascript('window.lockTarget()');
   }
 
+  void enableZoom(bool enable) {
+    if (hasError) return;
+    controller?.runJavascript('window.enableZoom($enable)');
+  }
+
   void _onObjectLoaded() {
     if (widget.onObjectLoaded != null) widget.onObjectLoaded!();
     Timer(widget.loaderDuration, () {
@@ -122,12 +127,15 @@ class _ModelViewerState extends State<ModelViewer> {
         setCameraRotation: setCameraRotation,
         addDirectionalLight: addDirectionalLight,
         lockTarget: lockTarget,
+        enableZoom: enableZoom,
       ),
     );
   }
 
   @override
   initState() {
+    if (Platform.isAndroid) WebView.platform = AndroidWebView();
+
     _initChannels();
     _initServer();
     super.initState();

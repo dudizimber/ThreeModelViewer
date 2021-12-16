@@ -55,6 +55,10 @@ const createControls = (camera) => {
 
 }
 
+const enableZoom = (zoom) => {
+	controls.enableZoom = zoom;
+}
+
 const setOrbitControls = (polMin, polMax, azMin, azMax) => {
 	if (!controls) {
 		if (!camera) {
@@ -231,3 +235,4 @@ window.setCameraRotation = setCameraRotation;
 window.setBackgroundColor = setBackgroundColor;
 window.lockTarget = lockTarget;
 window.setCamera = setCamera;
+window.enableZoom = enableZoom;

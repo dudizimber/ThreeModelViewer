@@ -18,19 +18,38 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(),
+      home: const HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+class HomePage extends StatelessWidget {
+  const HomePage({Key? key}) : super(key: key);
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+          child: ElevatedButton(
+        child: Text('Open model'),
+        onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => Model(),
+          ));
+        },
+      )),
+    );
+  }
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class Model extends StatefulWidget {
+  const Model({Key? key}) : super(key: key);
+
+  @override
+  State<Model> createState() => _ModelState();
+}
+
+class _ModelState extends State<Model> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -62,6 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 pos: Vector3(x: 10, y: 20, z: 30),
               ),
             );
+            controller.enableZoom(true);
           },
           onObjectLoading: (percentage) {
             print('$percentage');

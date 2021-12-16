@@ -8,6 +8,7 @@ class ModelViewerController {
   Function(String color, int intensity) addAmbientLight;
   Function(DirectionalLight light) addDirectionalLight;
   Function() lockTarget;
+  Function(bool enable) enableZoom;
 
   ModelViewerController({
     required this.setBackgroundColor,
@@ -16,5 +17,6 @@ class ModelViewerController {
     required this.setCameraRotation,
     required this.addDirectionalLight,
     required this.lockTarget,
+    required this.enableZoom,
   });
 }
