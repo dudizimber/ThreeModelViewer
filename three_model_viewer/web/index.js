@@ -189,7 +189,6 @@ window.addDirectionalLight = addDirectionalLight;
 window.setCameraPosition = setCameraPosition;
 window.setCameraRotation = setCameraRotation;
 window.setBackgroundColor = setBackgroundColor;
-window.setCamera = setCamera;
 window.enableZoom = enableZoom;
 window.createPerspectiveCamera = createPerspectiveCamera;
 window.createOrbitControls = createOrbitControls;
