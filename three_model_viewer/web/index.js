@@ -1,4 +1,4 @@
-import { S as Scene, W as WebGLRenderer, s as sRGBEncoding, P as PerspectiveCamera, O as OrbitControls, G as GridHelper, A as AxesHelper, a as GLTFLoader, D as DRACOLoader, b as AnimationMixer, c as AmbientLight, d as DirectionalLight, C as Clock } from "./vendor.ce91c239.js";
+import { S as Scene, W as WebGLRenderer, s as sRGBEncoding, P as PerspectiveCamera, O as OrbitControls, G as GridHelper, A as AxesHelper, a as GLTFLoader, D as DRACOLoader, b as AnimationMixer, c as AmbientLight, d as DirectionalLight, C as Clock } from "./vendor.js";
 const p = function polyfill() {
   const relList = document.createElement("link").relList;
   if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -41,8 +41,7 @@ const p = function polyfill() {
   }
 };
 p();
-var style = "";
-let scene, camera, clock, renderer, mixer, controls, loader, renderedObjects;
+let scene, camera, clock, renderer, mixer, controls, loader;
 const setupScene = () => {
   scene = new Scene();
   clock = new Clock();
@@ -54,16 +53,16 @@ const setupScene = () => {
   renderer.outputEncoding = sRGBEncoding;
   renderer.setClearColor(13421772);
   document.body.appendChild(renderer.domElement);
-  setCamera();
 };
-const setCamera = () => {
-  camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1e3);
-  camera.position.set(1, 0, 5);
+const createPerspectiveCamera = (fov, aspectRatio, near, far) => {
+  camera = new PerspectiveCamera(fov, aspectRatio != null ? aspectRatio : window.innerWidth / window.innerHeight, near, far);
   window.camera = camera;
-  createControls(camera);
+  animate();
 };
-const createControls = (camera2) => {
-  controls = new OrbitControls(camera2, renderer.domElement);
+const createOrbitControls = (c) => {
+  if (!camera && !c)
+    throw "No camera";
+  controls = new OrbitControls(c != null ? c : camera, renderer.domElement);
   controls.enablePan = false;
   controls.enableRotate = true;
   controls.enableZoom = false;
@@ -72,18 +71,20 @@ const createControls = (camera2) => {
   animate();
   window.controls = controls;
 };
+const enableZoom = (zoom) => {
+  controls.enableZoom = zoom;
+};
 const setOrbitControls = (polMin, polMax, azMin, azMax) => {
-  if (!controls) {
-    if (!camera) {
-      setTimeout(() => setOrbitControls(polMin, polMax, azMin, azMax), 100);
-    } else
-      createControls(camera);
-    return;
-  }
+  if (!controls)
+    throw "No controls";
   controls.minPolarAngle = polMin != null ? polMin : -Infinity;
   controls.maxPolarAngle = polMax != null ? polMax : Infinity;
   controls.minAzimuthAngle = azMin != null ? azMin : -Infinity;
   controls.maxAzimuthAngle = azMax != null ? azMax : -Infinity;
+};
+const setControlsTarget = (x, y, z) => {
+  controls.target.set(x, y, z);
+  controls.update();
 };
 const addGridHelper = () => {
   var helper = new GridHelper(100, 100);
@@ -117,7 +118,7 @@ const loadModel = (modelUrl, playAnimation) => {
         mixer = new AnimationMixer(gltf.scene);
         const action = mixer.clipAction(gltf.animations[0]);
         action.play();
-        renderedObjects = gltf.scene.children;
+        gltf.scene.children;
       }
       gltf.scene.traverse(function(node) {
         if (node.isMesh) {
@@ -126,7 +127,6 @@ const loadModel = (modelUrl, playAnimation) => {
         }
       });
       scene.add(gltf.scene);
-      console.log(scene);
       res(gltf);
     }, (xhr) => {
       console.log(xhr.loaded / xhr.total * 100 + "% loaded");
@@ -159,10 +159,6 @@ const loadCam = (modelUrl) => {
     });
   });
 };
-const lockTarget = () => {
-  var _a;
-  controls.target = (_a = renderedObjects[1]) == null ? void 0 : _a.position;
-};
 const addAmbientLight = (color, intensity) => {
   const ambient = new AmbientLight(color, intensity);
   scene.add(ambient);
@@ -184,6 +180,7 @@ const animate = () => {
 };
 window.setupScene = setupScene;
 window.setOrbitControls = setOrbitControls;
+window.setControlsTarget = setControlsTarget;
 window.loadModel = loadModel;
 window.loadCam = loadCam;
 window.addGridHelper = addGridHelper;
@@ -192,5 +189,7 @@ window.addDirectionalLight = addDirectionalLight;
 window.setCameraPosition = setCameraPosition;
 window.setCameraRotation = setCameraRotation;
 window.setBackgroundColor = setBackgroundColor;
-window.lockTarget = lockTarget;
 window.setCamera = setCamera;
+window.enableZoom = enableZoom;
+window.createPerspectiveCamera = createPerspectiveCamera;
+window.createOrbitControls = createOrbitControls;

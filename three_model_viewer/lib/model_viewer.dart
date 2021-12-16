@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:local_assets_server/local_assets_server.dart';
 import 'package:three_model_viewer/model_viewer_controller.dart';
 import 'package:three_model_viewer/models/orbit_controls.dart';
+import 'package:three_model_viewer/models/perspective_camera_config.dart';
 import 'package:three_model_viewer/models/three_model.dart';
 import 'package:three_model_viewer/three_model_viewer.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -12,26 +13,24 @@ import 'package:webview_flutter/webview_flutter.dart';
 class ModelViewer extends StatefulWidget {
   final List<ThreeModel> models;
   final Function(ModelViewerController controller) onPageLoaded;
-  final int fov;
+  final PerspectiveCameraConfig cameraConfig;
   final Duration loaderDuration;
   final Function(bool ready)? onServerReady;
   final Function(double? percentage)? onObjectLoading;
   final Function()? onObjectLoaded;
   final Function(Object error)? onError;
   final Widget? showWhenLoading;
-  final OrbitControls? orbitControls;
 
   const ModelViewer({
     Key? key,
     required this.models,
     required this.onPageLoaded,
-    this.fov = 50,
+    required this.cameraConfig,
     this.onServerReady,
     this.onError,
     this.onObjectLoaded,
     this.onObjectLoading,
     this.showWhenLoading,
-    this.orbitControls,
     this.loaderDuration = const Duration(milliseconds: 500),
   }) : super(key: key);
 
@@ -49,13 +48,9 @@ class _ModelViewerState extends State<ModelViewer> {
 
   Set<JavascriptChannel> channels = {};
 
-  void setupScene() {
-    if (hasError) return;
-    controller?.runJavascript('window.setupScene(\'${widget.fov}\')');
-    if (widget.orbitControls != null) {
-      controller?.runJavascript(
-          'window.setOrbitControls(${widget.orbitControls.toString()})');
-    }
+  Future<String?>? setupScene() {
+    if (hasError) return null;
+    return controller?.runJavascriptReturningResult('window.setupScene()');
   }
 
   void loadModels() {
@@ -66,9 +61,15 @@ class _ModelViewerState extends State<ModelViewer> {
     }
   }
 
-  void setCamera() {
+  Future<String?>? createCamera(PerspectiveCameraConfig cameraConfig) {
+    if (hasError) return null;
+    return controller?.runJavascriptReturningResult(
+        'window.createPerspectiveCamera($cameraConfig)');
+  }
+
+  void createOrbitControls() {
     if (hasError) return;
-    controller?.runJavascript('window.setCamera()');
+    controller?.runJavascript('window.createOrbitControls(undefined)');
   }
 
   void setBackgroundColor(String color, double alpha) {
@@ -86,6 +87,11 @@ class _ModelViewerState extends State<ModelViewer> {
     controller?.runJavascript('window.setCameraRotation($pos)');
   }
 
+  void setOrbitControls(OrbitControls orbitControls) {
+    if (hasError) return;
+    controller?.runJavascript('window.setOrbitControls($orbitControls)');
+  }
+
   void addAmbientLight(String color, int intensity) {
     if (hasError) return;
     controller?.runJavascript('window.addAmbientLight(\'$color\', $intensity)');
@@ -97,9 +103,9 @@ class _ModelViewerState extends State<ModelViewer> {
         'window.addDirectionalLight(${light.toString(map: true)})');
   }
 
-  void lockTarget() {
+  void setControlsTarget(Vector3 pos) {
     if (hasError) return;
-    controller?.runJavascript('window.lockTarget()');
+    controller?.runJavascript('window.setControlsTarget($pos)');
   }
 
   void enableZoom(bool enable) {
@@ -116,8 +122,11 @@ class _ModelViewerState extends State<ModelViewer> {
     });
   }
 
-  void _onPageFinishedLoading(_) {
-    setupScene();
+  void _onPageFinishedLoading(_) async {
+    await Future.delayed(Duration(milliseconds: 100));
+    await setupScene();
+    await createCamera(widget.cameraConfig);
+    createOrbitControls();
     loadModels();
     widget.onPageLoaded(
       ModelViewerController(
@@ -126,8 +135,9 @@ class _ModelViewerState extends State<ModelViewer> {
         setCameraPosition: setCameraPosition,
         setCameraRotation: setCameraRotation,
         addDirectionalLight: addDirectionalLight,
-        lockTarget: lockTarget,
         enableZoom: enableZoom,
+        setControlsTarget: setControlsTarget,
+        setOrbitControls: setOrbitControls,
       ),
     );
   }
