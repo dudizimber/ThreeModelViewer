@@ -97,9 +97,9 @@ class _ModelViewerState extends State<ModelViewer> {
         'window.addDirectionalLight(${light.toString(map: true)})');
   }
 
-  void lockTarget() {
+  void setControlsTarget(Vector3 pos) {
     if (hasError) return;
-    controller?.runJavascript('window.lockTarget()');
+    controller?.runJavascript('window.setControlsTarget($pos)');
   }
 
   void _onObjectLoaded() {
@@ -121,7 +121,7 @@ class _ModelViewerState extends State<ModelViewer> {
         setCameraPosition: setCameraPosition,
         setCameraRotation: setCameraRotation,
         addDirectionalLight: addDirectionalLight,
-        lockTarget: lockTarget,
+        setControlsTarget: setControlsTarget,
       ),
     );
   }

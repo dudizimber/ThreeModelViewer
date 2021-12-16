@@ -7,7 +7,7 @@ class ModelViewerController {
   Function(Vector3 pos) setCameraRotation;
   Function(String color, int intensity) addAmbientLight;
   Function(DirectionalLight light) addDirectionalLight;
-  Function() lockTarget;
+  Function(Vector3 pos) setControlsTarget;
 
   ModelViewerController({
     required this.setBackgroundColor,
@@ -15,6 +15,6 @@ class ModelViewerController {
     required this.setCameraPosition,
     required this.setCameraRotation,
     required this.addDirectionalLight,
-    required this.lockTarget,
+    required this.setControlsTarget,
   });
 }

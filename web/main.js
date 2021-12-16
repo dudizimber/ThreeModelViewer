@@ -1,18 +1,10 @@
-import './style.css'
-import { AnimationMixer, WebGLRenderer, AmbientLight, Scene, PerspectiveCamera, Clock, DirectionalLight, Box3, SpotLight, SpotLightHelper, CameraHelper, sRGBEncoding, OrthographicCamera, GridHelper, AxesHelper } from 'three';
+import { AnimationMixer, WebGLRenderer, AmbientLight, Scene, PerspectiveCamera, Clock, DirectionalLight, sRGBEncoding, GridHelper, AxesHelper } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 
-let scene, camera, clock, renderer, mixer, controls, loader, renderedObjects, bbox;
-
-
-let move = {
-	x: 0,
-	y: 0,
-	z: 0
-};
+let scene, camera, clock, renderer, mixer, controls, loader, renderedObjects;
 
 const setupScene = () => {
 
@@ -69,6 +61,10 @@ const setOrbitControls = (polMin, polMax, azMin, azMax) => {
 	controls.maxAzimuthAngle = azMax ?? -Infinity;
 }
 
+const setControlsTarget = (x, y, z) => {
+	controls.target.set(x, y, z);
+	controls.update();
+}
 
 const addGridHelper = () => {
 
@@ -132,7 +128,6 @@ const loadModel = (modelUrl, playAnimation) => {
 					}
 				});
 				scene.add(gltf.scene);
-				console.log(scene);
 
 				res(gltf);
 			},
@@ -196,9 +191,6 @@ const loadCam = (modelUrl) => {
 	})
 
 }
-const lockTarget = () => {
-	controls.target = renderedObjects[1]?.position;
-}
 
 const addAmbientLight = (color, intensity) => {
 	const ambient = new AmbientLight(color, intensity);
@@ -221,6 +213,7 @@ const animate = () => {
 
 window.setupScene = setupScene;
 window.setOrbitControls = setOrbitControls;
+window.setControlsTarget = setControlsTarget;
 window.loadModel = loadModel;
 window.loadCam = loadCam;
 window.addGridHelper = addGridHelper;
@@ -229,5 +222,4 @@ window.addDirectionalLight = addDirectionalLight;
 window.setCameraPosition = setCameraPosition;
 window.setCameraRotation = setCameraRotation;
 window.setBackgroundColor = setBackgroundColor;
-window.lockTarget = lockTarget;
 window.setCamera = setCamera;
