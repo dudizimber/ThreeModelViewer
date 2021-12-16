@@ -1,4 +1,4 @@
-import { S as Scene, W as WebGLRenderer, s as sRGBEncoding, P as PerspectiveCamera, O as OrbitControls, G as GridHelper, A as AxesHelper, a as GLTFLoader, D as DRACOLoader, b as AnimationMixer, c as AmbientLight, d as DirectionalLight, C as Clock } from "./vendor.ce91c239.js";
+import { S as Scene, W as WebGLRenderer, s as sRGBEncoding, P as PerspectiveCamera, O as OrbitControls, G as GridHelper, A as AxesHelper, a as GLTFLoader, D as DRACOLoader, b as AnimationMixer, c as AmbientLight, d as DirectionalLight, C as Clock } from "./vendor.js";
 const p = function polyfill() {
   const relList = document.createElement("link").relList;
   if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -53,16 +53,16 @@ const setupScene = () => {
   renderer.outputEncoding = sRGBEncoding;
   renderer.setClearColor(13421772);
   document.body.appendChild(renderer.domElement);
-  setCamera();
 };
-const setCamera = () => {
-  camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1e3);
-  camera.position.set(1, 0, 5);
+const createPerspectiveCamera = (fov, aspectRatio, near, far) => {
+  camera = new PerspectiveCamera(fov, aspectRatio != null ? aspectRatio : window.innerWidth / window.innerHeight, near, far);
   window.camera = camera;
-  createControls(camera);
+  animate();
 };
-const createControls = (camera2) => {
-  controls = new OrbitControls(camera2, renderer.domElement);
+const createOrbitControls = (c) => {
+  if (!camera && !c)
+    throw "No camera";
+  controls = new OrbitControls(c != null ? c : camera, renderer.domElement);
   controls.enablePan = false;
   controls.enableRotate = true;
   controls.enableZoom = false;
@@ -72,13 +72,8 @@ const createControls = (camera2) => {
   window.controls = controls;
 };
 const setOrbitControls = (polMin, polMax, azMin, azMax) => {
-  if (!controls) {
-    if (!camera) {
-      setTimeout(() => setOrbitControls(polMin, polMax, azMin, azMax), 100);
-    } else
-      createControls(camera);
-    return;
-  }
+  if (!controls)
+    throw "No controls";
   controls.minPolarAngle = polMin != null ? polMin : -Infinity;
   controls.maxPolarAngle = polMax != null ? polMax : Infinity;
   controls.minAzimuthAngle = azMin != null ? azMin : -Infinity;
@@ -191,4 +186,5 @@ window.addDirectionalLight = addDirectionalLight;
 window.setCameraPosition = setCameraPosition;
 window.setCameraRotation = setCameraRotation;
 window.setBackgroundColor = setBackgroundColor;
-window.setCamera = setCamera;
+window.createPerspectiveCamera = createPerspectiveCamera;
+window.createOrbitControls = createOrbitControls;

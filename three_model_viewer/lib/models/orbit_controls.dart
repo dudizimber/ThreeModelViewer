@@ -1,4 +1,4 @@
-import 'package:three_model_viewer/utils/translate_infinity.dart';
+import 'package:three_model_viewer/utils/translate_number.dart';
 
 class OrbitControls {
   double minPolarAngle;
@@ -16,6 +16,18 @@ class OrbitControls {
 
   @override
   String toString() {
-    return '${translateInfinity(minPolarAngle)}, ${translateInfinity(maxPolarAngle)}, ${translateInfinity(minAzimuthAngle)}, ${translateInfinity(maxAzimuthAngle)}';
+    return '${translateNumber(minPolarAngle, [
+          double.infinity,
+          -double.infinity
+        ])}, ${translateNumber(maxPolarAngle, [
+          double.infinity,
+          -double.infinity
+        ])}, ${translateNumber(minAzimuthAngle, [
+          double.infinity,
+          -double.infinity
+        ])}, ${translateNumber(maxAzimuthAngle, [
+          double.infinity,
+          -double.infinity
+        ])}';
   }
 }

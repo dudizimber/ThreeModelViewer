@@ -49,11 +49,13 @@ class _MyHomePageState extends State<MyHomePage> {
             //   playAnimation: false,
             // ),
           ],
-          orbitControls:
-              OrbitControls(minPolarAngle: pi / 2, maxPolarAngle: pi / 2),
+          cameraConfig: PerspectiveCameraConfig.def(),
           onPageLoaded: (controller) {
+            controller.setOrbitControls(
+                OrbitControls(minPolarAngle: pi / 2, maxPolarAngle: pi / 2));
             controller.setBackgroundColor('#000', 0);
             // controller.setCameraPosition(Vector3(x: 0, y: 5, z: 2));
+            controller.setControlsTarget(Vector3(x: 1, y: 2, z: 3));
             controller.addAmbientLight('#404040', 2);
             controller.addDirectionalLight(
               DirectionalLight(

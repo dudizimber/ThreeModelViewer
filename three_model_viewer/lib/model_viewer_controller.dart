@@ -8,6 +8,7 @@ class ModelViewerController {
   Function(String color, int intensity) addAmbientLight;
   Function(DirectionalLight light) addDirectionalLight;
   Function(Vector3 pos) setControlsTarget;
+  Function(OrbitControls orbitControls) setOrbitControls;
 
   ModelViewerController({
     required this.setBackgroundColor,
@@ -16,5 +17,6 @@ class ModelViewerController {
     required this.setCameraRotation,
     required this.addDirectionalLight,
     required this.setControlsTarget,
+    required this.setOrbitControls,
   });
 }

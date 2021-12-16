@@ -8,6 +8,13 @@ export default defineConfig(({command, mode }) => {
       outDir: '../three_model_viewer/web',
       minify: false,
       emptyOutDir: true,
+      rollupOptions: {
+        output: {
+          entryFileNames: `[name].js`,
+          chunkFileNames: `[name].js`,
+          assetFileNames: `[name].[ext]`
+        }
+      }
     }
   }
 });

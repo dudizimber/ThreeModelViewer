@@ -22,21 +22,17 @@ const setupScene = () => {
 
 	document.body.appendChild(renderer.domElement);
 
-	setCamera();
-
 }
 
-const setCamera = () => {
-
-	camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight, .1, 1000);
-	// camera.position.copy(c.position)
-	camera.position.set(1, 0, 5)
+const createPerspectiveCamera = (fov, aspectRatio, near, far) => {
+	camera = new PerspectiveCamera(fov, aspectRatio ?? window.innerWidth / window.innerHeight, near, far);
 	window.camera = camera;
-	createControls(camera);
+	animate();
 }
 
-const createControls = (camera) => {
-	controls = new OrbitControls(camera, renderer.domElement);
+const createOrbitControls = (c) => {
+	if (!camera && !c) throw 'No camera';
+	controls = new OrbitControls(c ?? camera, renderer.domElement);
 	controls.enablePan = false;
 	controls.enableRotate = true;
 	controls.enableZoom = false;
@@ -48,13 +44,7 @@ const createControls = (camera) => {
 }
 
 const setOrbitControls = (polMin, polMax, azMin, azMax) => {
-	if (!controls) {
-		if (!camera) {
-			setTimeout(() => setOrbitControls(polMin, polMax, azMin, azMax), 100);
-		} else
-			createControls(camera);
-	return;
-	}
+	if (!controls) throw 'No controls';
 	controls.minPolarAngle = polMin ?? -Infinity;
 	controls.maxPolarAngle = polMax ?? Infinity;
 	controls.minAzimuthAngle = azMin ?? -Infinity;
@@ -222,4 +212,5 @@ window.addDirectionalLight = addDirectionalLight;
 window.setCameraPosition = setCameraPosition;
 window.setCameraRotation = setCameraRotation;
 window.setBackgroundColor = setBackgroundColor;
-window.setCamera = setCamera;
+window.createPerspectiveCamera = createPerspectiveCamera;
+window.createOrbitControls = createOrbitControls;
