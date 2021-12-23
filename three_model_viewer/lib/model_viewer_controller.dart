@@ -10,6 +10,7 @@ class ModelViewerController {
   Function(bool enable) enableZoom;
   Function(Vector3 pos) setControlsTarget;
   Function(OrbitControls orbitControls) setOrbitControls;
+  Function(bool enable) setStats;
 
   ModelViewerController({
     required this.setBackgroundColor,
@@ -20,5 +21,6 @@ class ModelViewerController {
     required this.enableZoom,
     required this.setControlsTarget,
     required this.setOrbitControls,
+    required this.setStats,
   });
 }

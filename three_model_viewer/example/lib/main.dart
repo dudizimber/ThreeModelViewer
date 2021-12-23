@@ -70,11 +70,12 @@ class _ModelState extends State<Model> {
           ],
           cameraConfig: PerspectiveCameraConfig.def(),
           onPageLoaded: (controller) {
+            controller.setStats(true);
             controller.setOrbitControls(
                 OrbitControls(minPolarAngle: pi / 2, maxPolarAngle: pi / 2));
             controller.setBackgroundColor('#000', 0);
-            // controller.setCameraPosition(Vector3(x: 0, y: 5, z: 2));
-            controller.setControlsTarget(Vector3(x: 1, y: 2, z: 3));
+            controller.setCameraPosition(Vector3(x: 1, y: 0, z: 5));
+            controller.setControlsTarget(Vector3(x: 0, y: 1.2, z: 0));
             controller.addAmbientLight('#404040', 2);
             controller.addDirectionalLight(
               DirectionalLight(

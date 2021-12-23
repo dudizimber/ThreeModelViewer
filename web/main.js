@@ -2,16 +2,16 @@ import { AnimationMixer, WebGLRenderer, AmbientLight, Scene, PerspectiveCamera, 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import Stats from 'three/examples/jsm/libs/stats.module'
 
-
-let scene, camera, clock, renderer, mixer, controls, loader, renderedObjects;
+let scene, camera, clock, renderer, mixer, controls, loader, stats;
 
 const setupScene = () => {
 
 	scene = new Scene();
 	clock = new Clock();
 
-	renderer = new WebGLRenderer({ alpha: true, antialias: true,  });
+	renderer = new WebGLRenderer({ alpha: true, antialias: true, });
 
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
@@ -21,6 +21,18 @@ const setupScene = () => {
 	renderer.setClearColor(0xcccccc);
 
 	document.body.appendChild(renderer.domElement);
+
+}
+
+const setStats = (enable) => {
+	if (enable) {
+		const s = Stats()
+		document.body.appendChild(s.dom)
+		stats = s.dom;
+	} else if (stats) {
+		stats.remove();
+		stats = undefined;
+	}
 
 }
 
@@ -112,8 +124,6 @@ const loadModel = (modelUrl, playAnimation) => {
 					mixer = new AnimationMixer(gltf.scene);
 					const action = mixer.clipAction(gltf.animations[0]);
 					action.play();
-
-					renderedObjects = gltf.scene.children;
 				}
 				gltf.scene.traverse(function (node) {
 					if (node.isMesh) {
@@ -203,6 +213,7 @@ const animate = () => {
 	if (mixer) mixer.update(delta);
 	if (controls) controls.update();
 	renderer.render(scene, camera);
+    if (stats) stats.update()
 }
 
 window.setupScene = setupScene;
@@ -219,3 +230,4 @@ window.setBackgroundColor = setBackgroundColor;
 window.enableZoom = enableZoom;
 window.createPerspectiveCamera = createPerspectiveCamera;
 window.createOrbitControls = createOrbitControls;
+window.setStats = setStats;

@@ -1,4 +1,4 @@
-import { S as Scene, W as WebGLRenderer, s as sRGBEncoding, P as PerspectiveCamera, O as OrbitControls, G as GridHelper, A as AxesHelper, a as GLTFLoader, D as DRACOLoader, b as AnimationMixer, c as AmbientLight, d as DirectionalLight, C as Clock } from "./vendor.js";
+import { S as Scene, W as WebGLRenderer, s as sRGBEncoding, a as Stats, P as PerspectiveCamera, O as OrbitControls, G as GridHelper, A as AxesHelper, b as GLTFLoader, D as DRACOLoader, c as AnimationMixer, d as AmbientLight, e as DirectionalLight, C as Clock } from "./vendor.js";
 const p = function polyfill() {
   const relList = document.createElement("link").relList;
   if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -41,7 +41,7 @@ const p = function polyfill() {
   }
 };
 p();
-let scene, camera, clock, renderer, mixer, controls, loader;
+let scene, camera, clock, renderer, mixer, controls, loader, stats;
 const setupScene = () => {
   scene = new Scene();
   clock = new Clock();
@@ -53,6 +53,16 @@ const setupScene = () => {
   renderer.outputEncoding = sRGBEncoding;
   renderer.setClearColor(13421772);
   document.body.appendChild(renderer.domElement);
+};
+const setStats = (enable) => {
+  if (enable) {
+    const s = Stats();
+    document.body.appendChild(s.dom);
+    stats = s.dom;
+  } else if (stats) {
+    stats.remove();
+    stats = void 0;
+  }
 };
 const createPerspectiveCamera = (fov, aspectRatio, near, far) => {
   camera = new PerspectiveCamera(fov, aspectRatio != null ? aspectRatio : window.innerWidth / window.innerHeight, near, far);
@@ -118,7 +128,6 @@ const loadModel = (modelUrl, playAnimation) => {
         mixer = new AnimationMixer(gltf.scene);
         const action = mixer.clipAction(gltf.animations[0]);
         action.play();
-        gltf.scene.children;
       }
       gltf.scene.traverse(function(node) {
         if (node.isMesh) {
@@ -177,6 +186,8 @@ const animate = () => {
   if (controls)
     controls.update();
   renderer.render(scene, camera);
+  if (stats)
+    stats.update();
 };
 window.setupScene = setupScene;
 window.setOrbitControls = setOrbitControls;
@@ -192,3 +203,4 @@ window.setBackgroundColor = setBackgroundColor;
 window.enableZoom = enableZoom;
 window.createPerspectiveCamera = createPerspectiveCamera;
 window.createOrbitControls = createOrbitControls;
+window.setStats = setStats;

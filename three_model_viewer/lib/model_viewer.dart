@@ -113,6 +113,11 @@ class _ModelViewerState extends State<ModelViewer> {
     controller?.runJavascript('window.enableZoom($enable)');
   }
 
+  void setStats(bool enable) {
+    if (hasError) return;
+    controller?.runJavascript('window.setStats($enable)');
+  }
+
   void _onObjectLoaded() {
     if (widget.onObjectLoaded != null) widget.onObjectLoaded!();
     Timer(widget.loaderDuration, () {
@@ -138,6 +143,7 @@ class _ModelViewerState extends State<ModelViewer> {
         enableZoom: enableZoom,
         setControlsTarget: setControlsTarget,
         setOrbitControls: setOrbitControls,
+        setStats: setStats,
       ),
     );
   }

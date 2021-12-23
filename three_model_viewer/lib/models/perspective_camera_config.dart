@@ -19,6 +19,6 @@ class PerspectiveCameraConfig {
 
   @override
   String toString() {
-    return '$fov, ${translateNumber(aspectRatio, [null])}';
+    return '$fov, ${translateNumber(aspectRatio, [null])}, $near, $far';
   }
 }
